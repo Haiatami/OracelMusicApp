@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  oracle-db:
+    image: container-registry.oracle.com/database/enterprise:latest
+    ports:
+      - 1522:1521
+      - 5501:5500
+    volumes:
+      # - oracle-data:/opt/oracle/oradata
+      # - oracle-backup:/opt/oracle/backup
+      - E:/database/oracle/data:/opt/oracle/oradata
+      - E:/database/oracle/backup:/opt/oracle/backup
+    environment:
+      - ORACLE_SID=musicdb # chỉ được chứa a-z, A-Z, 0-9
+      - ORACLE_PDB=musicdbpdb1
+      - ORACLE_PWD=Admin123
+      - ORACLE_CHARACTERSET=AL32UTF8
+    healthcheck:
+      test: ["CMD", "bash", "-c", "sqlplus / as sysdba <<< 'select 1 from dual'"]
+      # lệnh này sẽ kết nối vào Oracle Database với quyền SYSDBA và
+      # thực thi truy vấn SQL đơn giản "select 1 from dual"
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
+
+# volumes:  
+#   oracle-backup:
+#   oracle-data:
+    # driver: local
+
+# Ngoài driver local, Docker hỗ trợ một số driver khác để quản lý volume.
+# nfs: Driver này cho phép bạn sử dụng dữ liệu từ một hệ thống tệp NFS (Network File System) 
+# để lưu trữ và chia sẻ dữ liệu giữa các container.
+# smb: Driver này cho phép bạn sử dụng dữ liệu từ một hệ thống tệp SMB (Server Message Block) 
+# để lưu trữ và chia sẻ dữ liệu giữa các container.
+# vfs: Đây là driver mặc định khi không có driver nào khác được cấu hình. 
+# Nó sử dụng một cơ chế đơn giản để lưu trữ và quản lý dữ liệu trên máy chủ Docker, 
+# tuy nhiên hiệu suất có thể thấp hơn so với các driver khác.    
+
+# docker-compose -f docker-compose.yml up -d
+
+# Để truy cập vào terminal của container, sử dụng lệnh sau
+# docker exec -it <tên_container> bash
+
